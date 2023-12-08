@@ -2,6 +2,53 @@
 header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Headers: Content-Type");
 include 'config.php';
+
+function mobiTechSendSms($phone, $sendmessage, $Sender_Id)
+{
+  $baseUrl = "http://bulksms.mobitechtechnologies.com/api/sendsms";
+  $ch = curl_init($baseUrl);
+  $data = array(
+    'api_key' => '6198b32ccfeb7',
+    'username' => 'umeskia',
+    'sender_id' => $Sender_Id,
+    'message' => $sendmessage,
+    'phone' => $phone
+  );
+  $payload = json_encode($data);
+  curl_setopt($ch, CURLOPT_POSTFIELDS, $payload);
+  curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type:application/json', 'Accept:application/json'));
+  curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+  $result = curl_exec($ch);
+  curl_close($ch);
+  return $result;
+}
+
+
+function hostpinnacleSms($sendmessage, $phone, $Sender_Id)
+{
+  $userid = "umeskia";
+  $password = "z18aypEW";
+  $curl = curl_init();
+  curl_setopt_array($curl, array(
+    CURLOPT_URL => "https://smsportal.hostpinnacle.co.ke/SMSApi/send",
+    CURLOPT_RETURNTRANSFER => true,
+    CURLOPT_ENCODING => "",
+    CURLOPT_MAXREDIRS => 10,
+    CURLOPT_TIMEOUT => 30,
+    CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+    CURLOPT_CUSTOMREQUEST => "POST",
+    CURLOPT_POSTFIELDS => "userid=$userid&password=$password&mobile=$phone&msg=$sendmessage&senderid=$Sender_Id&msgType=text&duplicatecheck=true&output=json&sendMethod=quick",
+    CURLOPT_HTTPHEADER => array(
+      "apikey: 290ff07d53b1939ea8b150e4db110f8d661ab090",
+      "cache-control: no-cache",
+      "content-type: application/x-www-form-urlencoded"
+    ),
+  ));
+  $response = curl_exec($curl);
+  return $response;
+}
+
+
 if ($_SERVER['REQUEST_METHOD'] == "POST") {
   $ResultCode = '';
   $callbackWebHookUrl = "";
@@ -101,7 +148,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
                       }
                       $getCreadit = mysqli_fetch_array(mysqli_query($db, "SELECT * FROM umeskiaservice WHERE email='$email' AND productName='sms'"));
                       //CHECK IF THE CALLBACK URL IS SET
-                      if (!$getCreadit['callback'] == '' || !$getCreadit['callback'] == null){
+                      if (!$getCreadit['callback'] == '' || !$getCreadit['callback'] == null) {
                         $callbackWebHookUrl = $getCreadit['callback'];
                       }
                       $credit = $getCreadit['accountBalance'];
@@ -110,41 +157,38 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
                       $newcredit = $credit - $numOfSms;
                       if ($credit > 0) {
                         if ($credit >= $numOfSms) {
-                          $baseUrl = "http://bulksms.mobitechtechnologies.com/api/sendsms";
-                          $ch = curl_init($baseUrl);
-                          $data = array(
-                            'api_key' => '6198b32ccfeb7',
-                            'username' => 'umeskia',
-                            'sender_id' => $Sender_Id,
-                            'message' => $sendmessage,
-                            'phone' => $phone
-                          );
-                          $payload = json_encode($data);
-                          curl_setopt($ch, CURLOPT_POSTFIELDS, $payload);
-                          curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type:application/json', 'Accept:application/json'));
-                          curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-                          $result = curl_exec($ch);
-                          curl_close($ch);
-                          $newResonse = str_replace(array('[', ']'), '',  $result);
-                          $data = json_decode($newResonse);
-                          $status = $data->status;
-                          if ($status == '200') {
-                            $msg_id = $data->message_id;
+                          $Sender_Id = 'UMS_SMS';
+                          $response = hostpinnacleSms($sendmessage, $phone, $Sender_Id);
+                          $data = json_decode($response);
+                          if (isset($data->status) && $data->status == 'success') {
+                            $msg_id = $data->transactionId;
+                            $channel = 'Api';
                             mysqli_query($db, "UPDATE umeskiaservice SET accountBalance='$newcredit' WHERE email='$email' AND productName='sms'");
-                            mysqli_query($db, "INSERT INTO messagedeliver(email,messageid) VALUES ('$email','$msg_id')");
-                            $ResultCode = "200";
-                            $massage = "Sms sent successfully";
-                            $response = array(
-                              'success' => $ResultCode,
-                              'message' => $massage,
-                              'request_id' => $request_id
-                            );
+                            $insertMessageResponse = mysqli_query($db, "INSERT INTO messagedeliver (email,request_id,messageid,channel) VALUES ('$email','$request_id','$msg_id','$channel')");
+                            if ($insertMessageResponse) {
+                              $ResultCode = "200";
+                              $massage = "Sms sent successfully";
+                              $response = array(
+                                'success' => $ResultCode,
+                                'message' => $massage,
+                                'request_id' => $msg_id
+                              );
+                            } else {
+                              //GET THE MYSQLI ERROR
+                              $error = mysqli_error($db);
+                              $ResultCode = "503";
+                              $massage = "$error";
+                              $response = array(
+                                'ResultCode' => $ResultCode,
+                                'errorMessage' => $massage,
+                              );
+                            }
                           } else {
                             $ResultCode = "503";
-                            $massage = "Application error please try again later";
+                            $massage = "Application error please try again later ";
                             $response = array(
                               'ResultCode' => $ResultCode,
-                              'errorMessage' => $massage
+                              'errorMessage' => $massage,
                             );
                           }
                         } else {

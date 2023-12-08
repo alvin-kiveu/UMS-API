@@ -1,6 +1,10 @@
 <?php
 header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Headers: Content-Type");
+https: //smsportal.hostpinnacle.co.ke/SMSApi/report/status?userid=umeskia&password=xxxxx&uuid=8403414672158573510&output=json
+
+
+
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
   include 'config.php';
@@ -10,6 +14,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
   $api_key = mysqli_escape_string($db, $submitedData['api_key']);
   $email = mysqli_escape_string($db, $submitedData['email']);
   $request_id = mysqli_escape_string($db, $submitedData['request_id']);
+
   if ($api_key == '' or $email == '' or  $request_id == '') {
     $ResultCode = "102";
     $massage = "Request is missing required query parameter!";
@@ -22,31 +27,43 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     if (mysqli_num_rows($checkcridential) > 0) {
       $checkdata = mysqli_query($db, "SELECT *  FROM ums_users  WHERE email='$email' AND apiKey='$api_key'");
       if (mysqli_num_rows($checkdata) > 0) {
-        $baseUrl = "http://bulksms.mobitechtechnologies.com/api/sms_delivery_status";
-        $ch = curl_init($baseUrl);
-        $data = array(
-          'api_key' => '6198b32ccfeb7',
-          'username' => 'umeskia',
-          'message_id' => $request_id
-        );
-        $payload = json_encode($data);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, $payload);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type:application/json', 'Accept:application/json'));
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        $result = curl_exec($ch);
-        $datasent = json_decode($result);
-        curl_close($ch);
+        function hostpinnacleSmsReport($uuid)
+        {
+          $userid = "umeskia";
+          $password = "z18aypEW";
+          $url = "https://smsportal.hostpinnacle.co.ke/SMSApi/report/status?userid=$userid&password={$password}&uuid={$uuid}&output=json";
+          $response = file_get_contents($url);
+          return $response;
+        }
+        $uuid = $request_id;
+        $response = hostpinnacleSmsReport($uuid);
+        $data = json_decode($response, true);
+        $status = $data['response']['status'];
+        $uuid = $data['response']['report_statusList'][0]['status']['uuid'];
+        $msgId = $data['response']['report_statusList'][0]['status']['msgId'];
+        $length = $data['response']['report_statusList'][0]['status']['length'];
+        $msgType = $data['response']['report_statusList'][0]['status']['msgType'];
+        $StatusDelivery = $data['response']['report_statusList'][0]['status']['Status'];
+        $mobileNo = $data['response']['report_statusList'][0]['status']['mobileNo'];
+        $text = $data['response']['report_statusList'][0]['status']['text'];
+        $deliveryStatus = $data['response']['report_statusList'][0]['status']['Status'];
+        $submittedTime = $data['response']['report_statusList'][0]['status']['Submitted Time'];
+        $deliveredTime = $data['response']['report_statusList'][0]['status']['Delivered Time'];
+        $senderName = $data['response']['report_statusList'][0]['status']['senderName'];
+        $cost = $data['response']['report_statusList'][0]['status']['cost'];
         $ResultCode = "200";
         $response = array(
           'ResultCode' => $ResultCode,
-          'request_id' => $datasent->message_id,
-          'send_time' => $datasent->send_time,
-          'sender_name' => $datasent->sender_name,
-          'recepient' => $datasent->recepient,
-          'sms_unit' => $datasent->sms_unit,
-          'network_name' => $datasent->network_name,
-          'message' => $datasent->message,
-          'status' => $datasent->status
+          'request_id' => $request_id,
+          'submitted_time' => $submittedTime,
+          'send_time' => $deliveredTime,
+          'sender_name' => $senderName,
+          'recepient' => $mobileNo,
+          'sms_unit' =>  $cost,
+          'sms_length' => $length,
+          'sms_type' => $msgType,
+          'message' => $text,
+          'status' => $deliveryStatus
         );
       } else {
         $ResultCode = "Error";
