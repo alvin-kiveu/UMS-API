@@ -1,4 +1,2 @@
 <?php
-header("Access-Control-Allow-Origin: *");
-// header("Access-Control-Allow-Headers: Content-Type");
-// include 'config.php'
+$TransactionID = "UMSPID" . date('dmYHis') . rand(10000, 99999);

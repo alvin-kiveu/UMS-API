@@ -114,7 +114,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
             $checkEmail = mysqli_query($db, "SELECT * FROM ums_users WHERE email='$email'");
             if (mysqli_num_rows($checkEmail) > 0) {
               $checkSenderId = mysqli_query($db, "SELECT * FROM senderids WHERE email='$email' AND sid='$Sender_Id'");
-              if (mysqli_num_rows($checkSenderId) > 0 || $Sender_Id == '23107') {
+              if (mysqli_num_rows($checkSenderId) > 0 || $Sender_Id == '23107' || $Sender_Id == 'UMS_SMS') {
                 $get_user_id = "SELECT *  FROM ums_users  WHERE email='$email' AND apiKey='$api_key';";
                 $result_get_user_id = mysqli_query($db, $get_user_id);
                 if (mysqli_num_rows($result_get_user_id) > 0) {

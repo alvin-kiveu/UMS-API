@@ -1,0 +1,55 @@
+{
+  "ResponseCode": 0,
+  "ResponseDescription": "Success. Request accepted for processing",
+  "MerchantRequestID": "121512-183926904-1",
+  "CheckoutRequestID": "ws_CO_09122023132211349768168060",
+  "TransactionID": "UMSPID0912202313221297248",
+  "TransactionAmount": 1,
+  "TransactionReceipt": "RL97NUQMDD",
+  "TransactionDate": "20231209132212",
+  "TransactionReference": "675432",
+  "Msisdn": "254768168060"
+}
+{
+  "ResponseCode": 1032,
+  "ResponseDescription": "Request cancelled by user",
+  "MerchantRequestID": "101483-121614870-1",
+  "CheckoutRequestID": "ws_CO_09122023132257513768168060",
+  "TransactionAmount": 1,
+  "TransactionDate": "20231209132258",
+  "TransactionReference": "675432",
+  "Msisdn": "254768168060",
+  "TransactionID": "UMSPID0912202313225866636"
+}{
+  "ResponseCode": 0,
+  "ResponseDescription": "Success. Request accepted for processing",
+  "MerchantRequestID": "42589-3715049-1",
+  "CheckoutRequestID": "ws_CO_09122023135514497768168060",
+  "TransactionID": "UMSPID0912202313551517555",
+  "TransactionAmount": 1,
+  "TransactionReceipt": "RL92NYRCN8",
+  "TransactionDate": "20231209135515",
+  "TransactionReference": "675432",
+  "Msisdn": "254768168060"
+}{
+  "ResponseCode": 1032,
+  "ResponseDescription": "Request cancelled by user",
+  "MerchantRequestID": "28130-3455804-1",
+  "CheckoutRequestID": "ws_CO_09122023135551395768168060",
+  "TransactionID": "UMSPID0912202313555219029",
+  "TransactionAmount": 1,
+  "TransactionDate": "20231209135552",
+  "TransactionReference": "675432",
+  "Msisdn": "254768168060"
+}{
+  "ResponseCode": 0,
+  "ResponseDescription": "Success. Request accepted for processing",
+  "MerchantRequestID": "3964-83480759-1",
+  "CheckoutRequestID": "ws_CO_09122023153614381768168060",
+  "TransactionID": "UMSPID0912202315361560840",
+  "TransactionAmount": 1,
+  "TransactionReceipt": "RL98OB2S58",
+  "TransactionDate": "20231209153615",
+  "TransactionReference": "675432",
+  "Msisdn": "254768168060"
+}{"ResponseCode":1037,"ResponseDescription":"DS timeout user cannot be reached","MerchantRequestID":"17132-81583779-1","CheckoutRequestID":"ws_CO_09122023153735487768168060","TransactionID":"UMSPID0912202315373769327","TransactionAmount":1,"TransactionDate":"20231209153737","TransactionReference":"675432","Msisdn":"254768168060"}{"ResponseCode":1037,"ResponseDescription":"DS timeout user cannot be reached","MerchantRequestID":"1191-112741748-1","CheckoutRequestID":"ws_CO_09122023204109655768168060","TransactionID":"UMSPID0912202320411410666","TransactionAmount":1,"TransactionDate":"20231209204114","TransactionReference":"675432","Msisdn":"254768168060"}
